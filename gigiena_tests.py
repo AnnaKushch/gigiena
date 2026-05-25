@@ -88,8 +88,8 @@ try:
     tests = parse_tests(text)
 
     mode = st.radio(
-    "Режим теста",
-    ["🔀 Случайный", "📖 По порядку"]
+        "Режим теста",
+        ["🔀 Случайный", "📖 По порядку"]
     )
 
     if not tests:
@@ -98,36 +98,45 @@ try:
 
     # ---------- INIT ----------
 
-if "mode" not in st.session_state:
-    st.session_state.mode = None
+    if "mode" not in st.session_state:
+        st.session_state.mode = None
 
-# если режим изменился — сбрасываем тест
-if st.session_state.mode != mode:
-    st.session_state.mode = mode
-    st.session_state.tests_pool = None
-    st.session_state.i = 0
-    st.session_state.score = 0
-    st.session_state.checked = False
-    st.session_state.selected = None
-    st.session_state.all_results = []
+    # если режим изменился — сбрасываем всё
+    if st.session_state.mode != mode:
+        st.session_state.mode = mode
+        st.session_state.tests_pool = None
+        st.session_state.i = 0
+        st.session_state.score = 0
+        st.session_state.checked = False
+        st.session_state.selected = None
+        st.session_state.all_results = []
+        st.session_state.batch = None
 
-# создаём пул вопросов
-if "tests_pool" not in st.session_state or st.session_state.tests_pool is None:
+    # ---------- создаём пул вопросов ----------
+    if st.session_state.tests_pool is None:
 
-    if mode == "🔀 Случайный":
-        st.session_state.tests_pool = random.sample(tests, len(tests))
-    else:
-        st.session_state.tests_pool = tests.copy()
+        if mode == "🔀 Случайный":
+            st.session_state.tests_pool = random.sample(tests, len(tests))
+        else:
+            st.session_state.tests_pool = tests.copy()
 
-# создаём билет
-if "batch" not in st.session_state:
-    st.session_state.batch = st.session_state.tests_pool[:BATCH_SIZE]
+    # ---------- создаём билет ----------
+    if st.session_state.batch is None:
+        st.session_state.batch = st.session_state.tests_pool[:BATCH_SIZE]
 
+    # ---------- текущий вопрос ----------
     current = st.session_state.batch[st.session_state.i]
 
+    # ---------- UI ----------
     st.write(f"### Вопрос {st.session_state.i + 1} / {BATCH_SIZE}")
     st.write(current["question"])
 
+    # дальше у тебя уже идёт ANSWER / RESULT (оставляешь как есть)
+
+except Exception as e:
+    st.error(f"Ошибка: {e}")
+
+    
     # ---------- ANSWER ----------
     if not st.session_state.checked:
         st.session_state.selected = st.radio(
