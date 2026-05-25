@@ -95,6 +95,9 @@ try:
     if "started" not in st.session_state:
         st.session_state.started = False
 
+    if "results_map" not in st.session_state:
+        st.session_state.results_map = {}
+
     if not st.session_state.started:
 
         st.title("📚 Тренажёр по биологии")
@@ -140,7 +143,7 @@ try:
         st.session_state.selected = st.radio(
             "Выбери ответ",
             current["options"],
-            key=f"q_{st.session_state.i}"
+            key=f"q_{st.session_state.i}_{st.session_state.mode}"
         )
 
         if st.button("Ответить"):
