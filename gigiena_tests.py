@@ -194,6 +194,13 @@ try:
 
             st.rerun()
 
+    correct_count = sum(
+    1 for v in st.session_state.results_map.values()
+    if v["is_correct"]
+    )
+    
+    st.markdown(f"### 🧠 Правильных ответов: {correct_count} / {len(st.session_state.batch)}")
+
     # ---------- NAVIGATION ----------
     st.markdown("---")
     st.markdown("### 📍 Навигация")
