@@ -207,33 +207,40 @@ try:
     # ---------- NAVIGATION ----------
     st.markdown("---")
     st.markdown("### 📍 Навигация")
-    
-    cols = st.columns(10)
-    
-    for idx in range(len(st.session_state.batch)):
-    
-        col = cols[idx % 10]
-    
-        with col:
-    
-            label = str(idx + 1)
-    
-            if "results_map" in st.session_state and idx in st.session_state.results_map:
 
-                if st.session_state.results_map[idx]["is_correct"]:
-                    label = "🟢 " + label
+    cols_per_row = 5  # 🔥 для телефона идеально
+    
+    for i in range(0, len(st.session_state.batch), cols_per_row):
+
+        row = st.columns(cols_per_row)
+    
+        for j in range(cols_per_row):
+
+            idx = i + j
+    
+            if idx >= len(st.session_state.batch):
+                break
+    
+            with row[j]:
+
+                label = str(idx + 1)
+    
+                if idx in st.session_state.results_map:
+    
+                    if st.session_state.results_map[idx]["is_correct"]:
+                        label = "🟢 " + label
+                    else:
+                        label = "🔴 " + label
                 else:
-                    label = "🔴 " + label
-            else:
-                label = "⚪ " + label
+                    label = "⚪ " + label
+
+                if st.button(label, key=f"nav_{idx}"):
     
-            if st.button(label, key=f"nav_{idx}"):
+                    st.session_state.i = idx
+                    st.session_state.checked = False
+                    st.session_state.selected = None
     
-                st.session_state.i = idx
-                st.session_state.checked = False
-                st.session_state.selected = None
-    
-                st.rerun()
+                    st.rerun()
 
 except Exception as e:
     st.error(f"Ошибка: {e}")
