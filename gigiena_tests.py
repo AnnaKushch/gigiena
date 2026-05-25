@@ -3,7 +3,7 @@ import random
 from docx import Document
 
 
-FILE_PATH = "tests.docx"
+FILE_PATH = "гигиена.docx"
 
 
 def load_docx(file_path):
