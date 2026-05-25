@@ -8,8 +8,7 @@ FILE_PATH = "гигиена.docx"
 
 def load_docx(file_path):
     doc = Document(file_path)
-    text = "\n".join([p.text for p in doc.paragraphs])
-    return text
+    return "\n".join([p.text for p in doc.paragraphs])
 
 
 def parse_tests(text):
@@ -42,10 +41,14 @@ def parse_tests(text):
     return tests
 
 
-# ---------- LOAD DATA ----------
+# ---------- LOAD ----------
 try:
     text = load_docx(FILE_PATH)
     tests = parse_tests(text)
+
+    if not tests:
+        st.error("Файл не содержит тестов")
+        st.stop()
 
     # ---------- STATE ----------
     if "i" not in st.session_state:
@@ -53,19 +56,17 @@ try:
         st.session_state.score = 0
         st.session_state.tests = random.sample(tests, len(tests))
         st.session_state.answered = False
-        st.session_state.last_answer = None
-        st.session_state.is_correct = None
 
     current = st.session_state.tests[st.session_state.i]
 
     st.write(f"### {st.session_state.i + 1}. {current['question']}")
 
-    # ---------- ANSWERING ----------
+    # ---------- ANSWER ----------
     if not st.session_state.answered:
         answer = st.radio("Выбери ответ", current["options"], key=f"q_{st.session_state.i}")
 
         if st.button("Ответить"):
-            st.session_state.last_answer = answer
+            st.session_state.user_answer = answer
             st.session_state.is_correct = (answer == current["correct"])
             st.session_state.answered = True
 
@@ -74,58 +75,24 @@ try:
 
             st.rerun()
 
-    # ---------- SHOW RESULT ----------
-else:
-
-    correct = test["answer"]
-
-    st.write("---")
-
-    for opt in test["options"]:
-
-        if opt == correct:
-            st.markdown("🟢 " + opt)
-
-        elif opt == st.session_state.selected:
-            st.markdown("🔴 " + opt)
-
-        else:
-            st.markdown("⚪ " + opt)
-
-    # ---------- SCORE ----------
-    if not st.session_state.saved_answer:
-
-        st.session_state.results.append({
-            "question": test["question"],
-            "selected": st.session_state.selected,
-            "correct": correct,
-            "is_correct": st.session_state.selected == correct
-        })
-    
-        st.session_state.saved_answer = True
-    
-    if st.session_state.selected == correct:
-        st.success("✅ Правильно")
-
-        # защита от двойного подсчёта
-        if not st.session_state.get("counted", False):
-            st.session_state.score += 1
-            st.session_state.counted = True
-
+    # ---------- RESULT ----------
     else:
-        st.error(f"❌ Неправильно. Правильный: {correct}")
+        if st.session_state.is_correct:
+            st.success("Правильно ✅")
+        else:
+            st.error("Неправильно ❌")
 
-    # ---------- NEXT ----------
-    if st.button("Дальше ➡️"):
+        st.info(f"Правильный ответ: {current['correct']}")
 
-        st.session_state.i += 1
-        st.session_state.checked = False
-        st.session_state.selected = None
-        st.session_state.counted = False
-        st.session_state.saved_answer = False
-            
-        
-    st.rerun()
+        if st.button("Далее"):
+            st.session_state.i += 1
+            st.session_state.answered = False
+
+            if st.session_state.i >= len(st.session_state.tests):
+                st.write(f"### Тест завершен: {st.session_state.score}/{len(st.session_state.tests)}")
+                st.stop()
+
+            st.rerun()
 
 except Exception as e:
     st.error(f"Ошибка загрузки файла: {e}")
