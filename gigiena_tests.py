@@ -208,8 +208,9 @@ try:
     
             label = str(idx + 1)
     
-            if idx < len(st.session_state.all_results):
-                if st.session_state.all_results[idx]["is_correct"]:
+            if "results_map" in st.session_state and idx in st.session_state.results_map:
+
+                if st.session_state.results_map[idx]["is_correct"]:
                     label = "🟢 " + label
                 else:
                     label = "🔴 " + label
