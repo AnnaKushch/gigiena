@@ -87,13 +87,23 @@ try:
     text = load_docx(FILE_PATH)
     tests = parse_tests(text)
 
+    mode = st.radio(
+    "Режим теста",
+    ["🔀 Случайный", "📖 По порядку"]
+    )
+
     if not tests:
         st.error("В файле нет тестов")
         st.stop()
 
     # ---------- INIT ----------
     if "tests_pool" not in st.session_state:
-        st.session_state.tests_pool = random.sample(tests, len(tests))
+        if "tests_pool" not in st.session_state:
+
+        if mode == "🔀 Случайный":
+            st.session_state.tests_pool = random.sample(tests, len(tests))
+        else:
+            st.session_state.tests_pool = tests.copy()
 
     if "i" not in st.session_state:
         st.session_state.i = 0
