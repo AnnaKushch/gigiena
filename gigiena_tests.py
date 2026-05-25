@@ -131,36 +131,6 @@ try:
     # ===================== CURRENT QUESTION =====================
     current = st.session_state.batch[st.session_state.i]
 
-    if st.session_state.mode == "📖 По порядку (все вопросы)":
-
-        st.write("---")
-        st.write("📍 Навигация по вопросам")
-    
-        cols = st.columns(10)  # максимум 10 кнопок в ряд
-
-        for idx in range(len(st.session_state.batch)):
-    
-            col_idx = idx % 10
-
-            with cols[col_idx]:
-    
-                label = str(idx + 1)
-
-                if idx < len(st.session_state.all_results):
-                    if st.session_state.all_results[idx]["is_correct"]:
-                        label = "🟢" + label
-                    else:
-                        label = "🔴" + label
-                else:
-                    label = "⚪" + label
-
-                if st.button(label, key=f"nav_{idx}"):
-    
-                    st.session_state.i = idx
-                    st.session_state.checked = False
-                    st.session_state.selected = None
-                    st.rerun()
-
     st.write(f"### Вопрос {st.session_state.i + 1} / {len(st.session_state.batch)}")
     st.write(current["question"])
 
@@ -218,6 +188,36 @@ try:
             if st.session_state.i >= len(st.session_state.batch):
                 st.session_state.finished = True
                 st.rerun()
+
+            st.rerun()
+
+# ---------- NAVIGATION ----------
+st.markdown("---")
+st.markdown("### 📍 Навигация")
+
+cols = st.columns(10)
+
+for idx in range(len(st.session_state.batch)):
+
+    col = cols[idx % 10]
+
+    with col:
+
+        label = str(idx + 1)
+
+        if idx < len(st.session_state.all_results):
+            if st.session_state.all_results[idx]["is_correct"]:
+                label = "🟢 " + label
+            else:
+                label = "🔴 " + label
+        else:
+            label = "⚪ " + label
+
+        if st.button(label, key=f"nav_{idx}"):
+
+            st.session_state.i = idx
+            st.session_state.checked = False
+            st.session_state.selected = None
 
             st.rerun()
 
