@@ -191,35 +191,35 @@ try:
 
             st.rerun()
 
-# ---------- NAVIGATION ----------
-st.markdown("---")
-st.markdown("### 📍 Навигация")
-
-cols = st.columns(10)
-
-for idx in range(len(st.session_state.batch)):
-
-    col = cols[idx % 10]
-
-    with col:
-
-        label = str(idx + 1)
-
-        if idx < len(st.session_state.all_results):
-            if st.session_state.all_results[idx]["is_correct"]:
-                label = "🟢 " + label
+    # ---------- NAVIGATION ----------
+    st.markdown("---")
+    st.markdown("### 📍 Навигация")
+    
+    cols = st.columns(10)
+    
+    for idx in range(len(st.session_state.batch)):
+    
+        col = cols[idx % 10]
+    
+        with col:
+    
+            label = str(idx + 1)
+    
+            if idx < len(st.session_state.all_results):
+                if st.session_state.all_results[idx]["is_correct"]:
+                    label = "🟢 " + label
+                else:
+                    label = "🔴 " + label
             else:
-                label = "🔴 " + label
-        else:
-            label = "⚪ " + label
-
-        if st.button(label, key=f"nav_{idx}"):
-
-            st.session_state.i = idx
-            st.session_state.checked = False
-            st.session_state.selected = None
-
-            st.rerun()
+                label = "⚪ " + label
+    
+            if st.button(label, key=f"nav_{idx}"):
+    
+                st.session_state.i = idx
+                st.session_state.checked = False
+                st.session_state.selected = None
+    
+                st.rerun()
 
 except Exception as e:
     st.error(f"Ошибка: {e}")
