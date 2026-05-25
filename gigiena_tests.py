@@ -12,7 +12,6 @@ def load_docx(file_path):
     return "\n".join([p.text for p in doc.paragraphs])
 
 
-# ---------- PARSE TESTS ----------
 def parse_tests(text):
     blocks = text.strip().split("\n\n")
     tests = []
@@ -23,6 +22,7 @@ def parse_tests(text):
             continue
 
         question = lines[0]
+
         options = []
         correct = None
 
@@ -34,6 +34,8 @@ def parse_tests(text):
                 options.append(line)
 
         if question and options and correct:
+            random.shuffle(options)  # 🔥 ВОТ ГЛАВНОЕ
+
             tests.append({
                 "question": question,
                 "options": options,
