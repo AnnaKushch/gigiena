@@ -151,13 +151,16 @@ try:
             if is_correct:
                 st.session_state.score += 1
 
-            st.session_state.all_results.append({
+            if "results_map" not in st.session_state:
+                st.session_state.results_map = {}
+
+            st.session_state.results_map[st.session_state.i] = {
                 "question": current["question"],
                 "options": current["options"],
                 "selected": st.session_state.selected,
                 "correct": current["correct"],
                 "is_correct": is_correct
-            })
+            }
 
             st.rerun()
 
