@@ -133,31 +133,31 @@ try:
 
     if st.session_state.mode == "📖 По порядку (все вопросы)":
 
-    st.write("---")
+        st.write("---")
+    
+        cols = st.columns(min(20, len(st.session_state.batch)))
+    
+        for idx in range(len(st.session_state.batch)):
 
-    cols = st.columns(min(20, len(st.session_state.batch)))
+            with cols[idx % len(cols)]:
 
-    for idx in range(len(st.session_state.batch)):
+                label = str(idx + 1)
 
-        with cols[idx % len(cols)]:
-
-            label = str(idx + 1)
-
-            if idx < len(st.session_state.all_results):
-                if st.session_state.all_results[idx]["is_correct"]:
-                    label = "🟢 " + label
+                if idx < len(st.session_state.all_results):
+                    if st.session_state.all_results[idx]["is_correct"]:
+                        label = "🟢 " + label
+                    else:
+                        label = "🔴 " + label
                 else:
-                    label = "🔴 " + label
-            else:
-                label = "⚪ " + label
+                    label = "⚪ " + label
 
-            if st.button(label, key=f"nav_{idx}"):
-
-                st.session_state.i = idx
-                st.session_state.checked = False
-                st.session_state.selected = None
-
-                st.rerun()
+                if st.button(label, key=f"nav_{idx}"):
+    
+                    st.session_state.i = idx
+                    st.session_state.checked = False
+                    st.session_state.selected = None
+    
+                    st.rerun()
 
     st.write(f"### Вопрос {st.session_state.i + 1} / {len(st.session_state.batch)}")
     st.write(current["question"])
