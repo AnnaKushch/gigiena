@@ -104,8 +104,8 @@ try:
 
     current = st.session_state.batch[st.session_state.i]
 
-   st.write(f"### Вопрос {st.session_state.i + 1} / {BATCH_SIZE}")
-    st.write(current['question'])
+    st.write(f"### Вопрос {st.session_state.i + 1} / {BATCH_SIZE}")
+    st.write(current["question"])
 
     # ---------- ANSWER ----------
     if not st.session_state.checked:
