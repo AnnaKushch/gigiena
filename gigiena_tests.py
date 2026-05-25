@@ -97,22 +97,31 @@ try:
         st.stop()
 
     # ---------- INIT ----------
-    if "tests_pool" not in st.session_state:
-        if "tests_pool" not in st.session_state:
 
-        if mode == "🔀 Случайный":
-            st.session_state.tests_pool = random.sample(tests, len(tests))
-        else:
-            st.session_state.tests_pool = tests.copy()
+if "mode" not in st.session_state:
+    st.session_state.mode = None
 
-    if "i" not in st.session_state:
-        st.session_state.i = 0
-        st.session_state.score = 0
-        st.session_state.checked = False
-        st.session_state.selected = None
-        st.session_state.all_results = []
+# если режим изменился — сбрасываем тест
+if st.session_state.mode != mode:
+    st.session_state.mode = mode
+    st.session_state.tests_pool = None
+    st.session_state.i = 0
+    st.session_state.score = 0
+    st.session_state.checked = False
+    st.session_state.selected = None
+    st.session_state.all_results = []
 
-        st.session_state.batch = st.session_state.tests_pool[:BATCH_SIZE]
+# создаём пул вопросов
+if "tests_pool" not in st.session_state or st.session_state.tests_pool is None:
+
+    if mode == "🔀 Случайный":
+        st.session_state.tests_pool = random.sample(tests, len(tests))
+    else:
+        st.session_state.tests_pool = tests.copy()
+
+# создаём билет
+if "batch" not in st.session_state:
+    st.session_state.batch = st.session_state.tests_pool[:BATCH_SIZE]
 
     current = st.session_state.batch[st.session_state.i]
 
