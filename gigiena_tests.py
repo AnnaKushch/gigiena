@@ -54,8 +54,7 @@ if st.session_state.get("finished", False):
 
     for r in st.session_state.all_results:
 
-        st.write(f"### Вопрос {st.session_state.i + 1} / {BATCH_SIZE}")
-        st.write(current['question'])
+        st.write(f"### {r['question']}")
 
         for opt in r["options"]:
             if opt == r["correct"]:
