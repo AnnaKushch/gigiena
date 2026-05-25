@@ -74,24 +74,58 @@ try:
 
             st.rerun()
 
-    # ---------- RESULT ----------
-    else:
-        if st.session_state.is_correct:
-            st.success("Правильно ✅")
+    # ---------- SHOW RESULT ----------
+else:
+
+    correct = test["answer"]
+
+    st.write("---")
+
+    for opt in test["options"]:
+
+        if opt == correct:
+            st.markdown("🟢 " + opt)
+
+        elif opt == st.session_state.selected:
+            st.markdown("🔴 " + opt)
+
         else:
-            st.error("Неправильно ❌")
+            st.markdown("⚪ " + opt)
 
-        st.info(f"Правильный ответ: {current['correct']}")
+    # ---------- SCORE ----------
+    if not st.session_state.saved_answer:
 
-        if st.button("Далее"):
-            st.session_state.i += 1
-            st.session_state.answered = False
+        st.session_state.results.append({
+            "question": test["question"],
+            "selected": st.session_state.selected,
+            "correct": correct,
+            "is_correct": st.session_state.selected == correct
+        })
+    
+        st.session_state.saved_answer = True
+    
+    if st.session_state.selected == correct:
+        st.success("✅ Правильно")
 
-            if st.session_state.i >= len(st.session_state.tests):
-                st.write(f"### Тест завершен: {st.session_state.score}/{len(st.session_state.tests)}")
-                st.stop()
+        # защита от двойного подсчёта
+        if not st.session_state.get("counted", False):
+            st.session_state.score += 1
+            st.session_state.counted = True
 
-            st.rerun()
+    else:
+        st.error(f"❌ Неправильно. Правильный: {correct}")
+
+    # ---------- NEXT ----------
+    if st.button("Дальше ➡️"):
+
+        st.session_state.i += 1
+        st.session_state.checked = False
+        st.session_state.selected = None
+        st.session_state.counted = False
+        st.session_state.saved_answer = False
+            
+        
+    st.rerun()
 
 except Exception as e:
     st.error(f"Ошибка загрузки файла: {e}")
