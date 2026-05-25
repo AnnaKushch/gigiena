@@ -87,55 +87,112 @@ try:
     text = load_docx(FILE_PATH)
     tests = parse_tests(text)
 
-    mode = st.radio(
-        "Режим теста",
-        ["🔀 Случайный", "📖 По порядку"]
-    )
-
     if not tests:
         st.error("В файле нет тестов")
         st.stop()
 
-    # ---------- INIT ----------
+    # ===================== HOME PAGE =====================
+    if "started" not in st.session_state:
+        st.session_state.started = False
 
-    if "mode" not in st.session_state:
-        st.session_state.mode = None
+    if not st.session_state.started:
 
-    # если режим изменился — сбрасываем всё
-    if st.session_state.mode != mode:
-        st.session_state.mode = mode
-        st.session_state.tests_pool = None
-        st.session_state.i = 0
-        st.session_state.score = 0
-        st.session_state.checked = False
-        st.session_state.selected = None
-        st.session_state.all_results = []
-        st.session_state.batch = None
+        st.title("📚 Тренажёр по биологии")
+        st.write("Выбери режим теста:")
 
-    # ---------- создаём пул вопросов ----------
-    if st.session_state.tests_pool is None:
+        mode = st.radio(
+            "Режим",
+            ["🔀 Случайный (20 вопросов)", "📖 По порядку (все вопросы)"]
+        )
 
-        if mode == "🔀 Случайный":
-            st.session_state.tests_pool = random.sample(tests, len(tests))
-        else:
-            st.session_state.tests_pool = tests.copy()
+        if st.button("▶ Начать"):
+            st.session_state.started = True
+            st.session_state.mode = mode
+            st.session_state.i = 0
+            st.session_state.score = 0
+            st.session_state.checked = False
+            st.session_state.selected = None
+            st.session_state.all_results = []
 
-    # ---------- создаём билет ----------
-    if st.session_state.batch is None:
-        st.session_state.batch = st.session_state.tests_pool[:BATCH_SIZE]
+            # --------- СЛУЧАЙНЫЙ ----------
+            if mode == "🔀 Случайный (20 вопросов)":
+                st.session_state.tests_pool = random.sample(tests, len(tests))
+                st.session_state.batch = st.session_state.tests_pool[:20]
 
-    # ---------- текущий вопрос ----------
+            # --------- ПО ПОРЯДКУ ----------
+            else:
+                st.session_state.tests_pool = tests.copy()
+                st.session_state.batch = tests  # ВСЕ ВОПРОСЫ
+
+            st.rerun()
+
+        st.stop()
+
+    # ===================== CURRENT QUESTION =====================
     current = st.session_state.batch[st.session_state.i]
 
-    # ---------- UI ----------
-    st.write(f"### Вопрос {st.session_state.i + 1} / {BATCH_SIZE}")
+    st.write(f"### Вопрос {st.session_state.i + 1} / {len(st.session_state.batch)}")
     st.write(current["question"])
 
-    # дальше у тебя уже идёт ANSWER / RESULT (оставляешь как есть)
+    # ---------- ANSWER ----------
+    if not st.session_state.checked:
+
+        st.session_state.selected = st.radio(
+            "Выбери ответ",
+            current["options"],
+            key=f"q_{st.session_state.i}"
+        )
+
+        if st.button("Ответить"):
+            st.session_state.checked = True
+
+            is_correct = st.session_state.selected == current["correct"]
+
+            if is_correct:
+                st.session_state.score += 1
+
+            st.session_state.all_results.append({
+                "question": current["question"],
+                "options": current["options"],
+                "selected": st.session_state.selected,
+                "correct": current["correct"],
+                "is_correct": is_correct
+            })
+
+            st.rerun()
+
+    # ---------- RESULT ----------
+    else:
+        correct = current["correct"]
+
+        st.write("---")
+
+        for opt in current["options"]:
+            if opt == correct:
+                st.markdown("🟢 " + opt)
+            elif opt == st.session_state.selected:
+                st.markdown("🔴 " + opt)
+            else:
+                st.markdown("⚪ " + opt)
+
+        if st.session_state.selected == correct:
+            st.success("✅ Правильно")
+        else:
+            st.error(f"❌ Неправильно. Правильный: {correct}")
+
+        if st.button("Далее ➡️"):
+            st.session_state.i += 1
+            st.session_state.checked = False
+            st.session_state.selected = None
+
+            if st.session_state.i >= len(st.session_state.batch):
+                st.session_state.finished = True
+                st.rerun()
+
+            st.rerun()
 
 except Exception as e:
     st.error(f"Ошибка: {e}")
-
     
     # ---------- ANSWER ----------
     if not st.session_state.checked:
