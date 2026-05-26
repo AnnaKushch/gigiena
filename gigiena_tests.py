@@ -100,7 +100,7 @@ try:
 
     if not st.session_state.started:
 
-        st.title("📚 Тренажёр по биологии")
+        st.title("📚 Тренажёр по гигиене")
         st.write("Выбери режим теста:")
 
         mode = st.radio(
